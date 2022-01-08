@@ -1,0 +1,1 @@
+<footer class="footer">© 2019 - 2020 All Rights Reserved - Azima Shaikh, Mohit Tutlani, Sakshi Shah<span class="d-none d-sm-inline-block"></span>.</footer>

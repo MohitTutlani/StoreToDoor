@@ -1,0 +1,193 @@
+<?php
+include 'connect.php';
+session_start();
+
+if(!isset($_SESSION['vendor_email']) &&   !isset($_SESSION['vendor_password']) )
+{
+   header("location:vendor_index.php");
+}
+
+$vendor_id=0;
+$sql=$link->rawQuery("select * from vendor_personal_tb where vendor_email=?",Array($_SESSION['vendor_email']));
+foreach($sql as $s)
+{
+	$vendor_id=$s['vendor_id_pk'];
+}
+$sql1=$link->rawQuery("select * from product_tb where vendor_id=?",Array($vendor_id));
+$product=$link->count;
+
+$sql2=$link->rawQuery("select count(order_id) as cnt from order_item_tb where vendor_id=? group by order_id",Array($vendor_id));
+$order=$link->count;
+
+$sql3=$link->rawQueryOne("select sum(vendor_income) as total from profit_tb where vendor_id=?",Array($vendor_id));
+$revenue=$sql3['total'];
+
+$sql4=$link->rawQueryOne("select count(*)as cnt from product_tb where vendor_id=? group by category_id",Array($vendor_id));
+$category=$link->count;
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dashboard</title>
+  <!-- Iconic Fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/flaticon.css">
+  <link rel="stylesheet" href="css/cryptocoins.css">
+  <link rel="stylesheet" href="css/cryptocoins-colors.css">
+  <!-- Bootstrap core CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery UI -->
+  <link href="css/jquery-ui.min.css" rel="stylesheet">
+  <!-- Page Specific CSS (Slick Slider.css) -->
+  <link href="css/slick.css" rel="stylesheet">
+  <!-- Mystic styles -->
+  <link href="css/style.css" rel="stylesheet">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32"  href="images/favicon.png">
+
+</head>
+
+<body class="ms-body ms-aside-left-open ms-primary-theme ms-has-quickbar">
+
+  <!-- Setting Panel -->
+  
+  <!-- Preloader -->
+  
+
+  <!-- Overlays -->
+  <div class="ms-aside-overlay ms-overlay-left ms-toggler" data-target="#ms-side-nav" data-toggle="slideLeft"></div>
+  <div class="ms-aside-overlay ms-overlay-right ms-toggler" data-target="#ms-recent-activity" data-toggle="slideRight"></div>
+
+  <!-- Sidebar Navigation Left -->
+ 
+	<?php include 'left_sidebar.php'; ?>
+  
+  <!-- Main Content -->
+  <main class="body-content">
+
+    <!-- Navigation Bar -->
+  
+<?php include 'vendor_header.php'; ?>
+    <!-- Body Content Wrapper -->
+    <div class="ms-content-wrapper">
+      <div class="row">
+
+       
+        <!-- Infographics -->
+        <div class="col-xl-3 col-sm-6 col-md-6">
+          <div class="ms-card ms-widget has-graph-full-width ms-infographics-widget">
+            <div class="ms-card-body media">
+              <!--<i class="cc BTC"></i>-->
+              <div class="media-body">
+                <span></span>
+                <h2>PRODUCTS </h2>
+                <h2>
+				<?php
+				if($product > 0)
+					echo $product;
+				else
+					echo 0?></h2></h2>
+              </div>
+            </div>
+            <canvas id="bitcoin-chart"></canvas>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-md-6">
+          <div class="ms-card ms-widget has-graph-full-width ms-infographics-widget">
+            <div class="ms-card-body media">
+             <!-- <i class="cc ETH"></i>-->
+              <div class="media-body">
+               <span></span>
+                <h2>ORDERS</h2>
+                <h2>
+				<?php
+				if($order > 0)
+					echo $order;
+				else
+					echo 0?>
+				</h2></h2>
+              </div>
+            </div>
+            <canvas id="ethereum-chart"></canvas>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-md-6">
+          <div class="ms-card ms-widget has-graph-full-width ms-infographics-widget">
+            <div class="ms-card-body media">
+              <!--<i class="cc ZEC-alt"></i>-->
+              <div class="media-body">
+                
+                <h2>REVENUE</h2>
+				<h2>
+				<?php
+				if($revenue > 0)
+					echo $revenue;
+				else
+					echo 0?></h2>
+              </div>
+            </div>
+            <canvas id="zcash-chart"></canvas>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-md-6">
+          <div class="ms-card ms-widget has-graph-full-width ms-infographics-widget">
+            <div class="ms-card-body media">
+              <!--<i class="cc PPC-alt"></i>-->
+              <div class="media-body">
+                
+                <h2>CATEGORY</h2>
+				<h2>
+				<?php
+				if($category > 0)
+					echo $category;
+				else
+					echo 0?>
+				</h2></h2>
+              </div>
+            </div>
+            <canvas id="peercoin-chart"></canvas>
+          </div>
+        </div>
+
+       
+        
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SCRIPTS -->
+  <!-- Global Required Scripts Start -->
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/perfect-scrollbar.js"> </script>
+  <script src="js/jquery-ui.min.js"> </script>
+  <!-- Global Required Scripts End -->
+
+  <!-- Page Specific Scripts Start -->
+  <script src="js/slick.min.js"> </script>
+  <script src="js/moment.js"> </script>
+  <script src="js/jquery.webticker.min.js"> </script>
+  <script src="js/Chart.bundle.min.js"> </script>
+  <script src="js/Chart.Financial.js"> </script>
+  <script src="js/cryptocurrency.js"> </script>
+  <!-- Page Specific Scripts Finish -->
+
+  <!-- Mystic core JavaScript -->
+  <script src="js/framework.js"></script>
+
+  <!-- Settings -->
+  <script src="js/settings.js"></script>
+
+</body>
+
+</html>
+

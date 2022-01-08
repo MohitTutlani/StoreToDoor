@@ -1,0 +1,2 @@
+// YouTubePopUp
+$("a.vid").YouTubePopUp();

@@ -1,0 +1,5 @@
+
+future scope
+1) filter product
+2) google map(lan,log acceptence)(popup address(location))
+4) sign in using google and facebook.

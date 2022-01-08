@@ -1,0 +1,210 @@
+<?php
+include 'connect.php';
+session_start();
+
+if(!isset($_SESSION['vendor_email']) &&   !isset($_SESSION['vendor_password']) )
+{
+    header("location:vendor_index.php");
+}
+
+$eid=$_GET['eid'];
+if(isset($_POST['edit']))
+{
+	$id=$_POST['eid'];
+	$product=$_POST['name'];
+	$sname=$_POST['sname'];
+	$ename=$_POST['ename'];
+	
+	$link->where("product_element_type_id_pk",$id);
+	$sql=$link->update("product_element_type_tb",Array("product_id"=>$product,"child_element_name"=>$ename,"product_element_id"=>$sname));
+	if($sql)
+	{
+		header("view_element.php");
+	}
+}
+
+?>
+<html lang="en">
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Edit Product Element Type</title>
+  <!-- Iconic Fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/flaticon.css">
+  <link rel="stylesheet" href="css/cryptocoins.css">
+  <link rel="stylesheet" href="css/cryptocoins-colors.css">
+  <!-- Bootstrap core CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <!-- jQuery UI -->
+  <link href="css/jquery-ui.min.css" rel="stylesheet">
+  <!-- Page Specific CSS (Slick Slider.css) -->
+  <link href="css/slick.css" rel="stylesheet">
+  <!-- Mystic styles -->
+  <link href="css/style.css" rel="stylesheet">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32"  href="images/favicon.png">
+<script>
+	function validate()
+	{
+		var s=true;
+		document.getElementById("err_name").innerHTML="";	
+		document.getElementById("err_pelement").innerHTML="";	
+		document.getElementById("err_ename").innerHTML="";	
+		
+		document.getElementById('idname').style.borderColor='rgba(0,0,0,0.1)';
+		document.getElementById('idelement').style.borderColor='rgba(0,0,0,0.1)';
+		document.getElementById('idename').style.borderColor='rgba(0,0,0,0.1)';
+		
+		var name=document.getElementById("idname").value;
+		if(name==-1)
+		{
+			document.getElementById("err_name").innerHTML="Select any product Name";
+			document.getElementById('idname').style.borderColor='#ff0000';
+			s=false;
+		}
+		var pelement=document.getElementById("idelement").value;
+		if(pelement==-1)
+		{
+			document.getElementById("err_pelement").innerHTML="Select Product Element";
+			document.getElementById('idelement').style.borderColor='#ff0000';
+			s=false;
+		}
+			
+		var ename=document.form.ename.value;
+		
+		if(ename=="")
+		{
+			document.getElementById("err_ename").innerHTML="Enter Product Element Name";
+			document.getElementById('idename').style.borderColor='#ff0000';
+			s=false;
+		}
+		
+		
+		return s;
+	}
+	
+	</script>
+</head>
+<body class="ms-body ms-aside-left-open ms-primary-theme ms-has-quickbar">
+
+  <!-- Sidebar Navigation Left -->
+ 
+	<?php include 'left_sidebar.php'; ?>
+  
+  <!-- Main Content -->
+  <main class="body-content">
+
+    <!-- Navigation Bar -->
+  
+<?php include 'vendor_header.php'; ?>
+    <!-- Body Content Wrapper -->
+      <div class="col-md-12" style="margin-top:30px; margin-bottom:30px;">
+          <div class="ms-panel">
+            <div class="ms-panel-header">
+              <h1>Edit Product Element Type</h1>
+            </div>
+            <div class="ms-panel-body">
+			<?php
+			
+			$product=$link->rawQueryOne("select * from product_element_type_tb where product_element_type_id_pk=?",Array($eid));
+			if($link->count>0)
+			{
+			?>
+              <form method="post" name="form" onSubmit="return validate()">
+			  <input type="text" value="<?php echo $eid; ?>" name="eid" hidden>
+                <div>
+                  <label>Product Name</label>
+                  <select class="form-control" name="name" id="idname">
+					  <option value="-1">select Product</option>
+					  <?php 
+					  $sql1=$link->rawQuery("select * from product_tb");
+					  foreach($sql1 as $s1)
+					  {
+						  ?>
+						  <option value="<?php echo $s1['product_id_pk']; ?>"
+						  <?php if($s1['product_id_pk']==$product['product_id']){echo "selected"; } ?>
+						  >
+						  <?php echo $s1['product_name']; ?>
+						  </option>
+						  
+					  <?php } ?>
+					  </select>
+                </div>
+				<div>
+					<span id="err_name" style="color:red;"> </span>
+				</div>
+				<br>
+				<div>
+                  <label>Product Element</label>
+                  <select class="form-control" name="sname" id="idelement">
+					  <option value="-1">select Element</option>
+					  <?php 
+					  $sql1=$link->rawQuery("select * from product_element_tb");
+					  foreach($sql1 as $s1)
+					  {
+						  ?>
+						  <option value="<?php echo $s1['product_element_id_pk']; ?>"
+						  <?php if($s1['product_element_id_pk']==$product['product_element_id']){echo "selected"; } ?>>
+						  <?php echo $s1['product_element_name']; ?>
+						  </option>
+						  
+					  <?php } ?>
+					  </select>
+                </div>
+				<div>
+					<span id="err_pelement" style="color:red;"> </span>
+				</div>
+				<br>
+				
+				<div class="form-group">
+                  <label>Element Name</label>
+                  <input type="type" class="form-control" name="ename" id="idename" value="<?php echo $product['child_element_name'];?>">
+                </div>
+				<div>
+					<span id="err_ename" style="color:red;"> </span>
+				</div>
+
+					<center><button class="btn btn-primary" type="submit" name="edit">Edit</button></center>
+              </form>
+			  <?php
+			}
+			  ?>
+            </div>
+          </div>
+      </div>
+     
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SCRIPTS -->
+  <!-- Global Required Scripts Start -->
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/perfect-scrollbar.js"> </script>
+  <script src="js/jquery-ui.min.js"> </script>
+  <!-- Global Required Scripts End -->
+
+  <!-- Page Specific Scripts Start -->
+  <script src="js/slick.min.js"> </script>
+  <script src="js/moment.js"> </script>
+  <script src="js/jquery.webticker.min.js"> </script>
+  <script src="js/Chart.bundle.min.js"> </script>
+  <script src="js/Chart.Financial.js"> </script>
+  <script src="js/cryptocurrency.js"> </script>
+  <!-- Page Specific Scripts Finish -->
+
+  <!-- Mystic core JavaScript -->
+  <script src="js/framework.js"></script>
+
+  <!-- Settings -->
+  <script src="js/settings.js"></script>
+
+</body>
+</html>
